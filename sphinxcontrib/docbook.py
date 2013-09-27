@@ -28,7 +28,7 @@ output_file = None
 
 class MyNodeVisitor(SparseNodeVisitor):
     def __init__(self, document):
-        self.document = document
+        SparseNodeVisitor.__init__(self, document)
 
         self.methods = []
         self.paths = {}
