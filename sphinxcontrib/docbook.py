@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (C) 2013 eNovance SAS <licensing@enovance.com>
 #
 # Author: Cyril Roelandt <cyril.roelandt@enovance.com>
