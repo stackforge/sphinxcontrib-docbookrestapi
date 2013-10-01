@@ -15,7 +15,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from sphinxcontrib.docbook import DocBookBuilder
+from sphinxcontrib.docbookrestapi.docbook import DocBookBuilder
 
 def setup(app):
     app.add_builder(DocBookBuilder)
