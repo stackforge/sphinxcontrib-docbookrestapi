@@ -18,7 +18,7 @@
 import json
 import xml.etree.ElementTree as ET
 
-from docutils.nodes import SparseNodeVisitor
+from docutils.nodes import SparseNodeVisitor, StopTraversal
 from lxml import etree
 from os import path
 from sphinx.builders import Builder
@@ -30,6 +30,7 @@ class MyNodeVisitor(SparseNodeVisitor):
     def __init__(self, document):
         SparseNodeVisitor.__init__(self, document)
 
+        self.must_parse = False
         self.methods = []
         self.paths = {}
         self.current_method = None
@@ -43,6 +44,12 @@ class MyNodeVisitor(SparseNodeVisitor):
         self.current_response_example = []
 
     def depart_document(self, node):
+        if not self.must_parse:
+            # We've probably raised StopTraversal, but walkabout() will keep
+            # running the depart_* functions. Here, this is only
+            # depart_document(), so we have to leave early.
+            return
+
         # We are done parsing this document, let's print everything we need.
         resources = ET.SubElement(self.root, 'resources', {
             'base': 'http://www.example.com'
@@ -91,6 +98,13 @@ class MyNodeVisitor(SparseNodeVisitor):
 
     def visit_bullet_list(self, node):
         self.in_bullet_list = True
+
+    def visit_comment(self, node):
+        # If this .rst file is meant to be parsed by
+        # sphinxcontrib-docbookrestapi, then it must have a comment, before the
+        # first section, that just reads 'docbookrestapi'.
+        if node.astext() == 'docbookrestapi':
+            self.must_parse = True
 
     def visit_document(self, node):
         # This is where we should start. Let's build the root.
@@ -188,6 +202,13 @@ class MyNodeVisitor(SparseNodeVisitor):
         elif self.in_request or self.in_response:
             self.visit_term(node)
 
+    def visit_section(self, node):
+        # If, by the time we visit the first section, we have not determined
+        # that this .rst file defines a REST API, then we probably should not
+        # be parsing it.
+        if not self.must_parse:
+            raise StopTraversal
+
     def visit_term(self, node):
         if self.in_request:
             self.current_request_example.append(node.astext())
@@ -236,13 +257,6 @@ class DocBookBuilder(Builder):
         pass
 
     def write_doc(self, docname, doctree):
-        # XXX: We only want to build the documentation for the v2 API.
-        # We should be able to tell sphinx-build not to try and build doc for
-        # other .rst files, but this does not seem to work. This is a
-        # (Ceilometer-specific) workaround.
-        if docname != 'webapi/v2':
-            return
-
         global output_file
         output_file = path.join(self.outdir, path.basename(docname) +
                                 self.out_suffix)
