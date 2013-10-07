@@ -15,13 +15,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from docutils.nodes import SparseNodeVisitor, StopTraversal
 import json
+import os
+from sphinx.builders import Builder
 from xml.dom import minidom
 import xml.etree.ElementTree as ET
 
-from docutils.nodes import SparseNodeVisitor, StopTraversal
-from os import path
-from sphinx.builders import Builder
 
 output_file = None
 
@@ -76,9 +76,9 @@ class MyNodeVisitor(SparseNodeVisitor):
             for k, v in d.iteritems():
                 tmp = ET.SubElement(root, 'resource', {'path': k})
                 if path + '/' + k + '/' in self.paths:
-                    for method in self.paths[path+'/'+k+'/']:
+                    for method in self.paths[path + '/' + k + '/']:
                         ET.SubElement(tmp, 'method', {'href': '#' + method})
-                build_resources(tmp, v, path+'/'+k)
+                build_resources(tmp, v, path + '/' + k)
 
         build_resources(resources, d)
 
@@ -88,7 +88,8 @@ class MyNodeVisitor(SparseNodeVisitor):
 
         # Finally, write the output.
         with open(output_file, 'w+') as f:
-            f.write(minidom.parseString(ET.tostring(self.root)).toprettyxml("    "))
+            parsed_string = minidom.parseString(ET.tostring(self.root))
+            f.write(parsed_string.toprettyxml("    "))
 
     # If we're inside a bullet list, all the "paragraph" elements will be
     # parameters description, so we need to know whether we currently are in a
@@ -174,8 +175,8 @@ class MyNodeVisitor(SparseNodeVisitor):
             text = node.astext()
             dashes_index = text.find('--')
             param_name = text[0:text.find(' ')]
-            param_type = text[text.find(' ')+1: dashes_index-1]
-            param_descr = text[dashes_index+3:]
+            param_type = text[text.find(' ') + 1: dashes_index - 1]
+            param_descr = text[dashes_index + 3:]
             param_type = param_type[1:]  # Remove '('
 
             # There are probably more types.
@@ -258,8 +259,8 @@ class DocBookBuilder(Builder):
 
     def write_doc(self, docname, doctree):
         global output_file
-        output_file = path.join(self.outdir, path.basename(docname) +
-                                self.out_suffix)
+        output_file = os.path.join(self.outdir, os.path.basename(docname) +
+                                   self.out_suffix)
 
         visitor = MyNodeVisitor(doctree)
         doctree.walkabout(visitor)
