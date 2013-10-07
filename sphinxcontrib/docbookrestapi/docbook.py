@@ -16,10 +16,10 @@
 # under the License.
 
 import json
+from xml.dom import minidom
 import xml.etree.ElementTree as ET
 
 from docutils.nodes import SparseNodeVisitor, StopTraversal
-from lxml import etree
 from os import path
 from sphinx.builders import Builder
 
@@ -88,7 +88,7 @@ class MyNodeVisitor(SparseNodeVisitor):
 
         # Finally, write the output.
         with open(output_file, 'w+') as f:
-            f.write(ET.tostring(self.root))
+            f.write(minidom.parseString(ET.tostring(self.root)).toprettyxml("    "))
 
     # If we're inside a bullet list, all the "paragraph" elements will be
     # parameters description, so we need to know whether we currently are in a
