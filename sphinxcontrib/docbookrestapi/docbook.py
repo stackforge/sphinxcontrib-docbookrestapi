@@ -164,8 +164,8 @@ class MyNodeVisitor(SparseNodeVisitor):
                 text = text[0:min_index]
 
             # Create the doc node in the method.
-            ET.SubElement(self.current_wadl_doc, 'p', {
-                'xmlns': 'http://www.w3.org/1999/xhtml'
+            ET.SubElement(self.current_wadl_doc, 'para', {
+                'role': 'shortdesc'
             }).text = text
             self.needs_method_description = False
         elif self.in_bullet_list:
