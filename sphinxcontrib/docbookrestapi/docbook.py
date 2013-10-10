@@ -140,6 +140,11 @@ class MyNodeVisitor(SparseNodeVisitor):
             self.methods.append(self.current_method)
             path = attrs['path'].replace('(', '{').replace(')', '}')
             self.paths.setdefault(path, []).append(method_id)
+            self.current_wadl_doc = ET.SubElement(self.current_method, 'wadl:doc', {
+                'xmlns': 'http://www.w3.org/1999/xhtml',
+                'xml:lang': 'EN',
+                'title': ''
+            })
             self.current_request = ET.SubElement(self.current_method,
                                                  'request')
             self.current_response = ET.SubElement(self.current_method,
@@ -159,12 +164,7 @@ class MyNodeVisitor(SparseNodeVisitor):
                 text = text[0:min_index]
 
             # Create the doc node in the method.
-            wadl = ET.SubElement(self.current_method, 'wadl:doc', {
-                'xmlns': 'http://www.w3.org/1999/xhtml',
-                'xml:lang': 'EN',
-                'title': ''
-            })
-            ET.SubElement(wadl, 'p', {
+            ET.SubElement(self.current_wadl_doc, 'p', {
                 'xmlns': 'http://www.w3.org/1999/xhtml'
             }).text = text
             self.needs_method_description = False
