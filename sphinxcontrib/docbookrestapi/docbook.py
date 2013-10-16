@@ -19,7 +19,7 @@ from docutils.nodes import SparseNodeVisitor, StopTraversal
 import json
 import os
 from sphinx.builders import Builder
-from xml.dom import minidom
+import tidylib
 import xml.etree.ElementTree as ET
 
 
@@ -139,8 +139,17 @@ class MyNodeVisitor(SparseNodeVisitor):
 
         # Finally, write the output.
         with open(output_file, 'w+') as f:
-            parsed_string = minidom.parseString(ET.tostring(self.root))
-            f.write(parsed_string.toprettyxml("    "))
+            options = {
+                'add-xml-decl': False,
+                'indent': True,
+                'indent-spaces': 4,
+                'input-xml': True,
+                'output-xml': True,
+                'wrap': 70
+            }
+            xml_str = tidylib.tidy_document(ET.tostring(self.root),
+                                            options=options)[0]
+            f.write(xml_str)
 
     # If we're inside a bullet list, all the "paragraph" elements will be
     # parameters description, so we need to know whether we currently are in a
