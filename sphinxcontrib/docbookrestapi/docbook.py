@@ -26,6 +26,57 @@ import xml.etree.ElementTree as ET
 output_file = None
 
 
+def generate_id(path, method):
+    path = path.replace('(', '')
+    path = path.replace(')', '')
+    elems = path.split('/')
+    elems = filter(lambda x: x, elems)  # Remove empty strings
+    elems = elems[1:]  # Remove "vx" (v1, v2...)
+
+    n_elems = len(elems)
+    name = ""
+
+    if method == 'delete':
+        if elems[-1].endswith('_id'):
+            name += "delete" + elems[-1][0:-3].capitalize()
+    elif method == 'get':
+        if elems[-1].endswith('_id'):
+            name += "show" + elems[-1][0:-3].capitalize()
+        elif n_elems > 2:
+            if elems[-3][:-1] + '_id' == elems[-2]:
+                name += 'show' + elems[-3][:-1].capitalize()
+                name += elems[-1].capitalize()
+        else:
+            name += "list" + elems[-1].capitalize()
+    elif method == 'post':
+        if elems[-1].endswith('_id'):
+            name += "create" + elems[-1][0:-3].capitalize()
+        else:
+            name += "create" + elems[-1][:-1].capitalize()
+    elif method == 'update':
+        if elems[-1].endswith('_id'):
+            name += "update" + elems[-1][0:-3].capitalize()
+
+    if not name:
+        name = raw_input('id for %s (%s)' % (path, method))
+
+    return name
+
+
+def generate_title_from_id(id_):
+    words = []
+    current_start = 0
+    for i, char in enumerate(id_):
+        if not char.islower():
+            words.append(id_[current_start:i].lower())
+            current_start = i
+
+    if i > current_start:
+        words.append(id_[current_start:])
+
+    return ' '.join(words).capitalize()
+
+
 class MyNodeVisitor(SparseNodeVisitor):
     def __init__(self, document):
         SparseNodeVisitor.__init__(self, document)
@@ -131,8 +182,7 @@ class MyNodeVisitor(SparseNodeVisitor):
     def visit_desc_signature(self, node):
         attrs = {k: v for (k, v) in node.attlist()}
         if 'method' in attrs and 'path' in attrs:
-            method_id = attrs['method'] + attrs['path'].replace('/', '_') + \
-                "method"
+            method_id = generate_id(attrs['path'], attrs['method'])
             self.current_method = ET.Element('method', {
                 'id': method_id,
                 'name': attrs['method'].upper()
@@ -140,11 +190,13 @@ class MyNodeVisitor(SparseNodeVisitor):
             self.methods.append(self.current_method)
             path = attrs['path'].replace('(', '{').replace(')', '}')
             self.paths.setdefault(path, []).append(method_id)
-            self.current_wadl_doc = ET.SubElement(self.current_method, 'wadl:doc', {
-                'xmlns': 'http://www.w3.org/1999/xhtml',
-                'xml:lang': 'EN',
-                'title': ''
-            })
+            self.current_wadl_doc = ET.SubElement(
+                self.current_method, 'wadl:doc', {
+                    'xmlns': 'http://www.w3.org/1999/xhtml',
+                    'xml:lang': 'EN',
+                    'title': generate_title_from_id(method_id)
+                }
+            )
             self.current_request = ET.SubElement(self.current_method,
                                                  'request')
             self.current_response = ET.SubElement(self.current_method,
