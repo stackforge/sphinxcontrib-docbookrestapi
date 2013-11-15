@@ -53,9 +53,14 @@ def generate_id(path, method):
             name += "create" + elems[-1][0:-3].capitalize()
         else:
             name += "create" + elems[-1][:-1].capitalize()
-    elif method == 'update':
+    elif method == 'put':
         if elems[-1].endswith('_id'):
             name += "update" + elems[-1][0:-3].capitalize()
+        elif elems[-2].endswith('_id'):
+            # The name is probably something like ".../foos/foo_id/bar". This
+            # is the case in Ceilometer for "/v2/alarms/alarm_id/state"
+            name += "update" + elems[-2][0:-3].capitalize() + \
+                elems[-1].capitalize()
 
     if not name:
         name = raw_input('id for %s (%s)' % (path, method))
