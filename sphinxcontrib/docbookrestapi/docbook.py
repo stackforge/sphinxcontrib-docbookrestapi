@@ -253,7 +253,7 @@ class MyNodeVisitor(SparseNodeVisitor):
             elif param_type .startswith("unicode"):
                 param_type = 'xsd:string'
             else:
-                raise ValueError(param_type)
+                param_type = param_type[:-1]  # Remove ')'
 
             tmp = ET.SubElement(self.current_request, 'param', {
                 'xmlns': 'http://wadl.dev.java.net/2009/02',
