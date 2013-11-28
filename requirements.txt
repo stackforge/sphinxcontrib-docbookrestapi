@@ -1,1 +1,3 @@
+docutils
 pytidylib6
+sphinx>=1.1.2

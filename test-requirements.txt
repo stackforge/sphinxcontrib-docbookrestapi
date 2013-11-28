@@ -1,0 +1,2 @@
+discover
+testrepository>=0.0.17
