@@ -30,7 +30,7 @@ def generate_id(path, method):
     path = path.replace('(', '')
     path = path.replace(')', '')
     elems = path.split('/')
-    elems = filter(lambda x: x, elems)  # Remove empty strings
+    elems = list(filter(lambda x: x, elems))  # Remove empty strings
     elems = elems[1:]  # Remove "vx" (v1, v2...)
 
     n_elems = len(elems)
@@ -189,12 +189,12 @@ class MyNodeVisitor(SparseNodeVisitor):
         self.in_method_definition = False
 
     def visit_desc(self, node):
-        attrs = {k: v for (k, v) in node.attlist()}
+        attrs= dict(node.attlist())
         if attrs['domain'] == 'http':
             self.in_method_definition = True
 
     def visit_desc_signature(self, node):
-        attrs = {k: v for (k, v) in node.attlist()}
+        attrs= dict(node.attlist())
         if 'method' in attrs and 'path' in attrs:
             method_id = generate_id(attrs['path'], attrs['method'])
             self.current_method = ET.Element('method', {
