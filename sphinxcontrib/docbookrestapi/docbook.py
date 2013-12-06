@@ -19,7 +19,10 @@ from docutils.nodes import SparseNodeVisitor, StopTraversal
 import json
 import os
 from sphinx.builders import Builder
-import tidylib
+try:
+    import tidylib
+except ImportError:
+    import subprocess
 import xml.etree.ElementTree as ET
 
 
@@ -152,8 +155,26 @@ class MyNodeVisitor(SparseNodeVisitor):
                 'output-xml': True,
                 'wrap': 70
             }
-            xml_str = tidylib.tidy_document(ET.tostring(self.root),
-                                            options=options)[0]
+            try:
+                xml_str = tidylib.tidy_document(ET.tostring(self.root),
+                                                options=options)[0]
+            except Exception:
+                p = subprocess.Popen([
+                    "echo", ET.tostring(self.root)
+                ], stdout=subprocess.PIPE)
+                p2 = subprocess.Popen([
+                    "tidy",
+                    "--add-xml-decl", "no",
+                    "--indent", "yes",
+                    "--indent-spaces", "4",
+                    "--input-xml", "yes",
+                    "--output-xml", "yes",
+                    "-wrap", "70",
+                ], stdin=p.stdout, stdout=subprocess.PIPE)
+                if p2.wait() != 0:
+                    print("Call to tidy failed: %s" % p2.communicate())
+                    return
+                xml_str = p2.communicate()[0]
             f.write(xml_str)
 
     # If we're inside a bullet list, all the "paragraph" elements will be
