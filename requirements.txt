@@ -1,1 +1,1 @@
-pytidylib>=0.2.1
+pytidylib6
