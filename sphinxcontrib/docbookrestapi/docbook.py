@@ -221,7 +221,7 @@ class MyNodeVisitor(SparseNodeVisitor):
             self.paths.setdefault(path, []).append(method_id)
             self.current_wadl_doc = ET.SubElement(
                 self.current_method, 'wadl:doc', {
-                    'xmlns': 'http://www.w3.org/1999/xhtml',
+                    'xmlns': 'http://docbook.org/ns/docbook',
                     'xml:lang': 'EN',
                     'title': generate_title_from_id(method_id)
                 }
@@ -277,7 +277,10 @@ class MyNodeVisitor(SparseNodeVisitor):
                 'required': 'false',  # XXX Can we get the right value ?
                 'style': 'query'      # XXX Can we get the right value ?
             })
-            tmp = ET.SubElement(tmp, 'doc')
+            tmp = ET.SubElement(tmp, 'wadl:doc', {
+                'xml:lang': 'EN',
+                'xmlns': 'http://docbook.org/ns/docbook'
+            })
             ET.SubElement(tmp, 'p', {
                 'xmlns': 'http://www.w3.org/1999/xhtml'
             }).text = param_descr
@@ -301,7 +304,7 @@ class MyNodeVisitor(SparseNodeVisitor):
             tmp = ET.SubElement(parent, 'representation', {
                 'mediaType': 'application/json'
             })
-            tmp = ET.SubElement(tmp, 'doc', {'xml:lang': 'EN'})
+            tmp = ET.SubElement(tmp, 'wadl:doc', {'xml:lang': 'EN'})
             json_text = json.loads(''.join(body))
             json_text = json.dumps(json_text, indent=4, sort_keys=True)
             ET.SubElement(tmp, 'xsdxt:code').text = json_text
