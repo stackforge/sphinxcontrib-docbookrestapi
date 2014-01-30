@@ -17,7 +17,7 @@
 
 import unittest
 
-from sphinxcontrib.docbookrestapi.docbook import generate_id
+from sphinxcontrib.docbookrestapi.docbook import clean_up_xml, generate_id
 
 
 class TestUtils(unittest.TestCase):
@@ -37,3 +37,16 @@ class TestUtils(unittest.TestCase):
 
         for (path, method, result) in test_cases:
             self.assertEqual(generate_id(path, method), result)
+
+    def test_clean_up_xml(self):
+        # Make sure the whitespace at the end of a self-closing tag is removed.
+        bad_xml = '''
+<root>
+    <selfclosingtag />
+</root>'''
+        good_xml = '''
+<root>
+    <selfclosingtag/>
+</root>'''
+        self.assertEqual(clean_up_xml(bad_xml), good_xml)
+        self.assertEqual(clean_up_xml(good_xml), good_xml)

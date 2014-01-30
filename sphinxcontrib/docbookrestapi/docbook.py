@@ -82,6 +82,16 @@ def generate_title_from_id(id_):
     return ' '.join(words).capitalize()
 
 
+def clean_up_xml(xml_str):
+    # tidy automatically inserts a whitespace at the end of a self-closing tag.
+    # See line 1347 at:
+    # http://tidy.cvs.sourceforge.net/viewvc/tidy/tidy/src/pprint.c?
+    # revision=1.119&view=markup
+
+    xml_str = xml_str.replace(' />', '/>')
+    return xml_str
+
+
 class MyNodeVisitor(SparseNodeVisitor):
     def __init__(self, document):
         SparseNodeVisitor.__init__(self, document)
@@ -154,7 +164,7 @@ class MyNodeVisitor(SparseNodeVisitor):
             }
             xml_str = tidylib.tidy_document(ET.tostring(self.root),
                                             options=options)[0]
-            f.write(xml_str)
+            f.write(clean_up_xml(xml_str))
 
     # If we're inside a bullet list, all the "paragraph" elements will be
     # parameters description, so we need to know whether we currently are in a
