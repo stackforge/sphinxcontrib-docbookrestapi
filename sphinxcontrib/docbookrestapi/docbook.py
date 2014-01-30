@@ -140,7 +140,12 @@ class MyNodeVisitor(SparseNodeVisitor):
 
         def build_resources(root, d, path=''):
             for k, v in d.iteritems():
-                tmp = ET.SubElement(root, 'resource', {'path': k})
+                tmp = ET.SubElement(root, 'resource', {
+                    # NOTE(cyril): sometimes, id and path might differ. This
+                    # should be good enough, though.
+                    'id': k.replace('{', '').replace('}', ''),
+                    'path': k,
+                })
                 if path + '/' + k + '/' in self.paths:
                     for method in self.paths[path + '/' + k + '/']:
                         ET.SubElement(tmp, 'method', {'href': '#' + method})
