@@ -38,6 +38,13 @@ class TestUtils(unittest.TestCase):
         for (path, method, result) in test_cases:
             self.assertEqual(generate_id(path, method), result)
 
+    def test_clean_up_xml_encoding(self):
+        # Make sure the right encoding is added.
+        self.assertEqual(
+            clean_up_xml('<?xml version="1.0"?>'),
+            '<?xml version="1.0" encoding="UTF-8"?>'
+        )
+
     def test_clean_up_xml(self):
         # Make sure the whitespace at the end of a self-closing tag is removed.
         bad_xml = '''

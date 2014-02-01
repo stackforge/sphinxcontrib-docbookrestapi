@@ -83,6 +83,12 @@ def generate_title_from_id(id_):
 
 
 def clean_up_xml(xml_str):
+    # When using UTF-8, tidy does not add an encoding attribute. Do it
+    # ourselves. See
+    # http://tidy.cvs.sourceforge.net/viewvc/tidy/tidy/src/lexer.c?
+    # revision=1.194&view=markup
+    xml_str = xml_str.replace('?>', ' encoding="UTF-8"?>', 1)
+
     # tidy automatically inserts a whitespace at the end of a self-closing tag.
     # See line 1347 at:
     # http://tidy.cvs.sourceforge.net/viewvc/tidy/tidy/src/pprint.c?
@@ -160,10 +166,11 @@ class MyNodeVisitor(SparseNodeVisitor):
         # Finally, write the output.
         with open(output_file, 'w+') as f:
             options = {
-                'add-xml-decl': False,
+                'add-xml-decl': True,
                 'indent': True,
                 'indent-spaces': 4,
                 'input-xml': True,
+                'output-encoding': 'utf8',
                 'output-xml': True,
                 'wrap': 70
             }
