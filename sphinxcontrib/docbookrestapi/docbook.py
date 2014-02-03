@@ -15,6 +15,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from datetime import date
 from docutils.nodes import SparseNodeVisitor, StopTraversal
 import json
 import os
@@ -95,6 +96,21 @@ def clean_up_xml(xml_str):
     # revision=1.119&view=markup
 
     xml_str = xml_str.replace(' />', '/>')
+
+    # Add this comment right after the <?...?> line. Not sure how to do this
+    # using ElementTree.Comment(), since there is no parent element here.
+    # XXX(cyril): The starting year may not be the right one for every project.
+    xml_str = xml_str.replace('?>\n', '''?>
+<!-- (C) 2012-%d OpenStack Foundation, All Rights Reserved -->
+<!--*******************************************************-->
+<!--         Import Common XML Entities                    -->
+<!--                                                       -->
+<!--     You can resolve the entites with xmllint          -->
+<!--                                                       -->
+<!--        xmllint -noent os-compute-2.wadl               -->
+<!--*******************************************************-->
+''' % date.today().year, 1)
+
     return xml_str
 
 
