@@ -286,12 +286,20 @@ class MyNodeVisitor(SparseNodeVisitor):
             text = node.astext()
             dashes_index = text.find('--')
             param_name = text[0:text.find(' ')]
-            param_type = text[text.find(' ') + 1: dashes_index - 1]
+            param_type = text[text.find(' ') + 1: dashes_index - 2]
             param_descr = text[dashes_index + 3:]
             param_type = param_type[1:]  # Remove '('
+            # Sometimes (especially when using enumerations), only some values
+            # may be allowed. If so, they should be listed in the
+            # documentation; store them here, and insert them in the code when
+            # creating the required elements.
+            valid_values = None
 
             # There are probably more types.
-            if param_type.startswith("int"):
+            if param_type.startswith("Enum"):
+                valid_values = param_type[5:-1].split(', ')
+                param_type = 'xsd:dict'
+            elif param_type.startswith("int"):
                 param_type = 'xsd:int'
             elif param_type.startswith("list"):
                 param_type = 'xsd:list'
@@ -310,7 +318,19 @@ class MyNodeVisitor(SparseNodeVisitor):
                 'xml:lang': 'EN',
                 'xmlns': 'http://docbook.org/ns/docbook'
             })
-            ET.SubElement(tmp, 'para').text = param_descr
+            tmp = ET.SubElement(tmp, 'para')
+            tmp.text = param_descr
+            if valid_values:
+                tmp.text += ' Valid values are '
+                for i, value in enumerate(valid_values):
+                    code = ET.SubElement(tmp, 'code')
+                    code.text = value
+                    if i + 1 != len(valid_values):
+                        code.tail = ', '
+                        if i + 2 == len(valid_values):
+                            code.tail += 'or '
+                    else:
+                        code.tail = '.'
         elif self.in_request or self.in_response:
             self.visit_term(node)
 
