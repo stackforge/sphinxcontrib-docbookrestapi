@@ -304,9 +304,7 @@ class MyNodeVisitor(SparseNodeVisitor):
                 'xml:lang': 'EN',
                 'xmlns': 'http://docbook.org/ns/docbook'
             })
-            ET.SubElement(tmp, 'p', {
-                'xmlns': 'http://www.w3.org/1999/xhtml'
-            }).text = param_descr
+            ET.SubElement(tmp, 'para').text = param_descr
         elif self.in_request or self.in_response:
             self.visit_term(node)
 
