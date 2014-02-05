@@ -294,7 +294,6 @@ class MyNodeVisitor(SparseNodeVisitor):
                 param_type = param_type[:-1]  # Remove ')'
 
             tmp = ET.SubElement(self.current_request, 'param', {
-                'xmlns': 'http://wadl.dev.java.net/2009/02',
                 'name': param_name,
                 'type': param_type,
                 'required': 'false',  # XXX Can we get the right value ?
