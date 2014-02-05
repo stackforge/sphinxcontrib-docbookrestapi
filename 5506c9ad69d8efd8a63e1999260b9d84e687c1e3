@@ -1,0 +1,8 @@
+Verified+2: Jenkins
+Approved+1: Cyril Roelandt <cyril.roelandt@enovance.com>
+Code-Review+2: Cyril Roelandt <cyril.roelandt@enovance.com>
+Submitted-by: Jenkins
+Submitted-at: Wed, 05 Feb 2014 21:47:32 +0000
+Reviewed-on: https://review.openstack.org/71375
+Project: stackforge/sphinxcontrib-docbookrestapi
+Branch: refs/heads/master
