@@ -43,8 +43,13 @@ def generate_id(path, method):
     elif method == 'get':
         if elems[-1].endswith('_id'):
             name += "show" + elems[-1][0:-3].capitalize()
+        elif elems[-1].endswith('_name'):
+            name += "show" + elems[-1][0:-5].capitalize()
         elif n_elems > 2:
             if elems[-3][:-1] + '_id' == elems[-2]:
+                name += 'show' + elems[-3][:-1].capitalize()
+                name += elems[-1].capitalize()
+            elif elems[-3][:-1] + '_name' == elems[-2]:
                 name += 'show' + elems[-3][:-1].capitalize()
                 name += elems[-1].capitalize()
         else:
@@ -52,6 +57,8 @@ def generate_id(path, method):
     elif method == 'post':
         if elems[-1].endswith('_id'):
             name += "create" + elems[-1][0:-3].capitalize()
+        elif elems[-1].endswith('_name'):
+            name += "create" + elems[-1][0:-5].capitalize()
         else:
             name += "create" + elems[-1][:-1].capitalize()
     elif method == 'put':

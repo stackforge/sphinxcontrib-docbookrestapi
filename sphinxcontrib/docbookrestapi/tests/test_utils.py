@@ -33,6 +33,11 @@ class TestUtils(unittest.TestCase):
 
             ('/v2/foos/foo_id/bar', 'get', 'showFooBar'),
             ('/v2/foos/foo_id/bar', 'put', 'updateFooBar'),
+
+            ('/v2/foos/foo_name', 'get', 'showFoo'),
+            ('/v2/foos/foo_name', 'post', 'createFoo'),
+
+            ('/v2/foos/foo_name/bar', 'get', 'showFooBar'),
         ]
 
         for (path, method, result) in test_cases:
